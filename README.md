@@ -114,27 +114,53 @@ Adding to what people have said about The Ridgeway Café. The wait figure of 10 
 <!-- One complete question and answer, pasted as text, with the source line
      visible. Milestone 4. -->
 
-**Question:**
+**Question:** How long does your student account, including campus wifi access, stay active after you graduate?
 
 **Answer:**
 
 ```
+Your student account stays active for six months after you graduate.
+
+Source: admin_wifi_and_accounts.txt
 ```
 
-**My relevance cutoff:**
+**Top-k:** 5 (kept the starter's default)
 
-<!-- The number you set in config.py, and how you got there.
+I ran `python app.py retrieve "..."` on 3 of my 5 questions before touching
+anything. Every one of them retrieved the correct chunk in position #1, with
+a large margin to position #2 (e.g. 0.119 vs. 0.563 for the library question),
+so there was no case where the right answer was getting buried further down
+and needed a bigger `top_k` to surface. I kept it at 5 rather than lowering it,
+since the grounding instruction already ignores irrelevant chunks in the
+retrieved set (see below) — a smaller `top_k` would save nothing and risks
+losing the right chunk on a harder question.
 
-     You ran five questions your corpus covers and the five in OUT_OF_SCOPE
-     that it clearly doesn't, and wrote down the best distance for each. What
-     did those two groups look like? Where was the gap? Put the actual numbers
-     here — the table below wants all ten rows.
+**My relevance cutoff:** 0.6 (kept the starter's default)
 
-     Milestone 4. -->
+I ran retrieval on all 5 of my test questions and the 5 `OUT_OF_SCOPE`
+questions and recorded the best (lowest) distance for each. The in-corpus
+questions topped out at 0.358; the out-of-scope questions bottomed out at
+0.825. That's a gap of nearly 0.47 with nothing in it, so almost any cutoff
+between 0.36 and 0.82 would work — 0.6 sits comfortably in the middle of that
+gap, so I kept it rather than moving it for the sake of moving it.
+
+I also checked `GROUNDING_INSTRUCTION` in `generate.py` with `--show-prompt`:
+even when 4 of the 5 retrieved chunks were irrelevant noise (course workload
+numbers, a shuttle schedule), the model still picked out only the correct
+chunk and cited it — so I didn't tighten the instruction further.
 
 | Question | In corpus? | Best distance |
 |---|---|---|
-|  |  |  |
+| How long does it take for a hold on a checked-out library book to become available? | Yes | 0.119 |
+| By what week must you withdraw from a course, as opposed to just dropping it? | Yes | 0.358 |
+| How do I file a grade appeal, and how many days do I have after my grade is posted? | Yes | 0.218 |
+| How much does an official transcript cost, and how long does it take to arrive electronically? | Yes | 0.158 |
+| How long does your student account, including campus wifi access, stay active after you graduate? | Yes | 0.245 |
+| What is the capital of Mongolia? | No | 0.825 |
+| How do I change the oil in a diesel engine? | No | 0.934 |
+| Who won the 1994 World Cup? | No | 0.886 |
+| What is the recommended dosage of ibuprofen for a headache? | No | 0.844 |
+| How do I write a for loop in Rust? | No | 0.891 |
 
 ## How I Used AI
 
