@@ -54,10 +54,14 @@ in at least 4 of 5 tries.
      what happened into your run log. Swap them for your own if you'd rather —
      just keep five of them, or the "4 of 5" above has nothing to be 4 of. -->
 
-**Why this target:** TBD — I haven't set my own cutoff yet (that's Milestone
-4). I'm keeping the pre-written 4-of-5 target for now and will come back to
-this reasoning once I've actually seen the distances for real vs. out-of-scope
-questions.
+**Why this target:** In Milestone 4 I measured the best distance for all 5 of
+my test questions (worst case 0.358) against all 5 `OUT_OF_SCOPE` questions
+(best case 0.825) — a gap of nearly 0.47 with nothing in it. Both groups landed
+solidly on their own side with room to spare, so I'd expect the gate to catch
+all 5 out-of-scope questions, not just 4. I'm keeping "4 of 5" rather than
+raising it to "5 of 5" because the gap I measured came from only 5 questions
+per side — a wider or oddly-worded out-of-scope question later could still
+land closer to the boundary than these five did.
 
 ---
 
