@@ -29,18 +29,36 @@
 
 ## Chunking Strategy
 
-**Chunk size:**
-**Overlap:**
+**Chunk size:** 400 characters
+**Overlap:** 60 characters
 
-<!-- What about YOUR documents made you pick these numbers? Short posts and
-     long sectioned guides don't want the same chunking, and "800 seemed
-     reasonable" earns nothing. Point at something you noticed when you read
-     the documents in Milestone 1.
+`campus_life` is 88 short posts, ~178–549 characters each, almost always
+1–4 sentences (average 317). The starter's fixed 800-character window never
+touched them — 88 documents in, 88 chunks out, because nothing reaches 800.
+That's not wrong, but a few posts pack two separate facts into one file
+(`admin_withdrawal_deadline.txt` covers both the drop deadline and the
+withdrawal deadline; several course-review posts cover both the class format
+and a separate piece of advice), and one fixed chunk hides that.
 
-     If you changed your mind partway through, say so and say why. That's worth
-     more than pretending you got it right first time.
+I replaced the fixed window with a sentence-aware splitter
+(`chunker.py::split_documents`): it groups whole sentences up to 400
+characters and never cuts mid-sentence, so a short single-fact post still
+comes out as one chunk, but a longer or multi-fact post gets a real chance to
+split at a sentence boundary. 60 characters of overlap (roughly one short
+sentence) carries the last sentence of a chunk into the next one, so a split
+chunk doesn't start cold.
 
-     Milestone 3. -->
+Re-indexing with this changed 88 chunks into **100 chunks, averaging 282
+characters (94–398)**. 12 documents split — mostly course reviews, where the
+splitter cleanly separated the class-format/workload sentences from the
+one-line "advice" sentence at the end. Worth noting: the two-fact deadline doc
+I expected to split (`admin_withdrawal_deadline.txt`, 342 characters) actually
+stayed as one chunk — it's under 400 characters even with both facts in it, so
+there was nothing to split. I decided that's fine rather than lowering the
+chunk size further: at 342 characters it's still well inside a reasonable
+chunk size, and the two facts are closely related (both are deadlines on the
+same topic), unlike the course reviews where the advice sentence is a genuinely
+separate thought from the format description.
 
 ## Sample Chunks
 
@@ -53,29 +71,42 @@
 
      Milestone 3. -->
 
-**Chunk 1** — source: `` — produced by: ``
+**Chunk 1** — source: `course_cs_210.txt#0` — produced by: `chunker.py::split_documents`
 
 ```
+CS 210 Data Structures
+
+I'm a junior and I've done this twice now. Format is lecture with weekly labs; slides go up after class, not before. Assessment: two midterms and a final, all drawn from lecture material rather than the textbook. Midterms are curved, the final is not. Expect 8 to 10 hours a week outside class.
 ```
 
-**Chunk 2** — source: `` — produced by: ``
+**Chunk 2** — source: `course_cs_210.txt#1` — produced by: `chunker.py::split_documents`
 
 ```
+Expect 8 to 10 hours a week outside class. The one piece of advice: do the labs even though they're only 10% — the exams reuse the lab problems.
 ```
 
-**Chunk 3** — source: `` — produced by: ``
+**Chunk 3** — source: `housing_morrow_house.txt#0` — produced by: `chunker.py::split_documents`
 
 ```
+Morrow House — what it's actually like
+
+Just finished a year in this building. Built 1954, partially renovated 2008. Rooms are singles and doubles, hall bathrooms. The good: cheapest housing tier by about $900 a year, and the singles are real singles. The bad: known damp problem on the ground floor; two rooms were taken offline in 2024. Laundry costs $1.50 wash, $1.25 dry, coin or card.
 ```
 
-**Chunk 4** — source: `` — produced by: ``
+**Chunk 4** — source: `admin_withdrawal_deadline.txt#0` — produced by: `chunker.py::split_documents`
 
 ```
+On the withdrawal deadline
+
+Withdrawal is a different thing from dropping and has a different date. Dropping ends at week six. Withdrawal runs to week ten, requires an adviser signature, and puts a W on the transcript that doesn't affect GPA. The two dates appear on different pages of the registrar's site and this catches people every year.
 ```
 
-**Chunk 5** — source: `` — produced by: ``
+**Chunk 5** — source: `dining_the_ridgeway_cafe_followup.txt#0` — produced by: `chunker.py::split_documents`
 
 ```
+Re: The Ridgeway Café
+
+Adding to what people have said about The Ridgeway Café. The wait figure of 10 to 15 minutes at 12:30 matches what I've seen. If you're trying to eat between classes, go before 11:45 and it's a different building entirely. Also worth saying: seating is tight; about 40 seats for a building of 900. Nobody tells you this at orientation.
 ```
 
 ## Sample Answer

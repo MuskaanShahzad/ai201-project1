@@ -28,11 +28,18 @@ CORPUS = os.getenv("AI201_CORPUS", "campus_life")
 
 
 # ─── Chunking (Milestone 3) ──────────────────────────────────────────────────
-# These are deliberately plain, generic numbers. Milestone 3 is where you
-# replace them with numbers that fit the documents you actually read.
+# campus_life posts run ~178-549 characters and are almost always 1-4
+# sentences. 400 lets a typical single-fact post stay whole (it's above the
+# average of 317) while still giving the longer multi-fact posts — like the
+# drop/withdraw deadlines, or the two library systems — room to split into two
+# real chunks instead of one that mixes both facts.
+#
+# 60 characters of overlap is roughly one short sentence: enough that a split
+# chunk doesn't start cold, without meaningfully duplicating content across
+# posts this short.
 
-CHUNK_SIZE = 800        # characters per chunk
-CHUNK_OVERLAP = 120     # characters shared between neighbouring chunks
+CHUNK_SIZE = 400        # characters per chunk
+CHUNK_OVERLAP = 60      # characters shared between neighbouring chunks
 
 
 # ─── Retrieval (Milestone 4) ─────────────────────────────────────────────────

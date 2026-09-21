@@ -80,24 +80,80 @@ def fallback_split(
     return chunks
 
 
-def split_documents(documents: list[Document]) -> list[Chunk]:
+import re
+
+_SENTENCE_SPLIT = re.compile(r"(?<=[.!?])\s+")
+
+
+def _split_sentences(text: str) -> list[str]:
+    return [s.strip() for s in _SENTENCE_SPLIT.split(text.strip()) if s.strip()]
+
+
+def split_documents(
+    documents: list[Document],
+    chunk_size: int | None = None,
+    overlap: int | None = None,
+) -> list[Chunk]:
     """
-    Split documents into chunks. ⚠️ REPLACE THE BODY OF THIS IN MILESTONE 3.
+    Sentence-aware chunking for campus_life: short, single-paragraph posts.
 
-    Right now it just calls the fallback. That is the plain, generic behaviour
-    the brief is talking about.
+    campus_life's posts run ~178-549 characters, almost always 1-4 sentences,
+    and a fixed 800-character window never touches them (88 docs -> 88 chunks).
+    But a few posts pack two separate facts together (admin_withdrawal_deadline
+    covers both the drop deadline and the withdrawal deadline; admin_library_
+    holds covers both an in-house hold and an interlibrary request) — those
+    deserve a chance to split, without ever cutting a sentence in half.
 
-    When you write your own strategy, set `produced_by` to
-    "chunker.py::split_documents" so your README's Sample Chunks section names
-    the right function. `app.py chunks` prints that string for you.
-
-    Things worth thinking about before you write any code:
-      - Are your documents short posts or long guides?
-      - Is the useful information in one sentence, or spread over a paragraph?
-      - Would splitting on paragraph breaks keep more thoughts intact than
-        splitting on a character count?
+    So instead of a character window, this groups whole sentences until the
+    next one would push the chunk past `chunk_size`, then starts a new chunk.
+    A short post that never reaches `chunk_size` just comes out as one chunk,
+    same as the fallback — the difference only shows up on the longer or
+    multi-fact posts.
     """
-    return fallback_split(documents)
+    chunk_size = chunk_size or config.CHUNK_SIZE
+    overlap = overlap or config.CHUNK_OVERLAP
+
+    chunks: list[Chunk] = []
+    for doc in documents:
+        sentences = _split_sentences(doc.text)
+        if not sentences:
+            continue
+
+        groups: list[list[str]] = []
+        current: list[str] = []
+        current_len = 0
+
+        for sentence in sentences:
+            if current and current_len + len(sentence) + 1 > chunk_size:
+                groups.append(current)
+                # Carry trailing sentences forward so the next chunk doesn't
+                # start cold — but only whole sentences, up to `overlap` chars.
+                carried: list[str] = []
+                carried_len = 0
+                for s in reversed(current):
+                    if carried_len + len(s) > overlap:
+                        break
+                    carried.insert(0, s)
+                    carried_len += len(s) + 1
+                current, current_len = carried, carried_len
+
+            current.append(sentence)
+            current_len += len(sentence) + 1
+
+        if current:
+            groups.append(current)
+
+        for i, group in enumerate(groups):
+            chunks.append(
+                Chunk(
+                    text=" ".join(group),
+                    source=doc.source,
+                    index=i,
+                    produced_by="chunker.py::split_documents",
+                )
+            )
+
+    return chunks
 
 
 def describe(chunks: list[Chunk]) -> str:
