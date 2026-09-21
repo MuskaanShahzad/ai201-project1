@@ -159,13 +159,6 @@ Instead, 12 course-review files split, separating the class info from a
 one-line piece of advice. I corrected the README to say what actually
 happened instead of the original guess.
 
-<!-- ── Stretch features ─────────────────────────────────────────────────────
-     Doing one? Say so here BEFORE you start. A feature this README never
-     claims earns nothing.
-     ───────────────────────────────────────────────────────────────────────── -->
-
----
-
 # Unit 2
 
 <!-- These sections get ADDED to what's already above. Don't delete or rewrite
