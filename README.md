@@ -1,31 +1,21 @@
 # The Unofficial Guide
 
-<!-- Replace this line with your name and which corpus you picked. -->
-
-> **This file is your submission.** Fill it in as you go — most sections get
-> written during the milestone that produces them, not at the end.
->
-> How the starter works, and every command you'll need, is in `RUNNING.md`.
-> Leave that file alone.
->
-> **Paste everything as text.** No screenshots, no video. A typed table gets
-> full credit; a picture of the same table gets none.
->
-> Delete these instruction blocks as you replace them. The `<!-- -->` comments
-> are notes to you and don't show up when the page renders — you can leave them
-> or remove them.
-
----
+Muskaan Shahzad — corpus: `campus_life`
 
 # Unit 1
 
 ## What This Does
 
-<!-- Three or four sentences. Which corpus you picked, and the kinds of
-     questions your system answers. Write it for someone who has never seen
-     this repo.
-
-     Milestone 5. -->
+This is a question-answering system for `campus_life` — 88 short, real-student
+posts about the parts of college nobody puts in the official handbook: drop
+and withdrawal deadlines, library holds, transcript costs, wifi/account
+expiration, grade appeals, dining hall wait times, dorm reviews, and course
+workload. Ask it something like "how much does an official transcript cost?"
+or "what's Morrow House actually like?" and it retrieves the specific post(s)
+that cover it, answers using only that text, and names the file it came from.
+If you ask something the corpus doesn't cover — like a question about a
+different school, or something totally unrelated — it says so instead of
+guessing.
 
 ## Chunking Strategy
 
@@ -61,15 +51,6 @@ same topic), unlike the course reviews where the advice sentence is a genuinely
 separate thought from the format description.
 
 ## Sample Chunks
-
-<!-- Five chunks, pasted as text. Label each one and name the file it came from
-     AND the function that produced it — the grader checks your code against
-     what you claim here.
-
-     `python app.py chunks -n 5` prints all three for you. Copy them straight
-     across.
-
-     Milestone 3. -->
 
 **Chunk 1** — source: `course_cs_210.txt#0` — produced by: `chunker.py::split_documents`
 
@@ -110,9 +91,6 @@ Adding to what people have said about The Ridgeway Café. The wait figure of 10 
 ```
 
 ## Sample Answer
-
-<!-- One complete question and answer, pasted as text, with the source line
-     visible. Milestone 4. -->
 
 **Question:** How long does your student account, including campus wifi access, stay active after you graduate?
 
@@ -164,18 +142,22 @@ chunk and cited it — so I didn't tighten the instruction further.
 
 ## How I Used AI
 
-<!-- Two specific moments. For each: what you asked for, what came back, and
-     what you changed about it.
+**1.** For criteria 4 and 5, I asked Claude to help me turn my ideas into
+properly worded acceptance criteria. It asked me what would make a chunk feel
+wrong, and what would bug me most if the system got wrong — I answered in a
+few words each ("shouldn't cut mid-sentence," "wrong source cited is worse
+than no source"), and Claude helped shape those into numbered criteria with
+real targets (100–600 characters; 4 of 5 correct source citations). I picked
+the actual numbers, and Claude ran the criteria self-check against all five
+to confirm each one was testable from the sentence alone.
 
-     "I asked Claude to write the chunking function from my notes. It ignored
-     the overlap, so I added that myself" is the level of detail we're after.
-     "I used AI to help me code" is not.
-
-     Milestone 5. -->
-
-**1.**
-
-**2.**
+**2.** For Milestone 3, I asked Claude to write the chunking function. It
+guessed `admin_withdrawal_deadline.txt` (two deadlines in one file) would
+split into two chunks and built the size/overlap numbers around that. When we
+ran it, that file didn't split — it fit in one 343-character chunk anyway.
+Instead, 12 course-review files split, separating the class info from a
+one-line piece of advice. I corrected the README to say what actually
+happened instead of the original guess.
 
 <!-- ── Stretch features ─────────────────────────────────────────────────────
      Doing one? Say so here BEFORE you start. A feature this README never
