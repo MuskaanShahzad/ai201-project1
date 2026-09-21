@@ -19,6 +19,10 @@ load_dotenv(ROOT / ".env")
 # ─── The corpus you're working with ──────────────────────────────────────────
 # Change this to switch corpora, or pass --corpus on the command line.
 # Options are the folder names inside corpora/. See corpora/README.md.
+#
+# Milestone 1: picked campus_life on purpose — short, single-sentence posts
+# about student life (dining, housing, parking) are the kind of thing people
+# would actually ask this system about.
 
 CORPUS = os.getenv("AI201_CORPUS", "campus_life")
 
