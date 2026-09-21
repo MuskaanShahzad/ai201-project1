@@ -22,9 +22,12 @@ pipeline earns credit; *"80% seemed reasonable"* does not.
 For at least 4 of my 5 test questions, the retrieved chunks include one that
 contains the answer.
 
-**Why this target:**
-<!-- e.g. "One of my questions is about a topic only two documents mention, so
-     I expect that one to be hard." -->
+**Why this target:** My library-hold question is the one I expect to be hardest:
+the corpus has two separate documents about the library
+(`admin_library_holds.txt` and `study_library_hours.txt`), so retrieval could
+plausibly pull the wrong one into the top results. The other four questions
+each map to exactly one document with no similar competitor, so I'd expect
+those to retrieve cleanly.
 
 ---
 
@@ -32,9 +35,11 @@ contains the answer.
 
 Every answer the system produces names at least one source document.
 
-**Why this target:**
-<!-- Why all five and not four? What about your setup makes that achievable —
-     or what would have to go wrong for it not to be? -->
+**Why this target:** I checked `generate.py`: the model is told, as a system
+instruction, to name the filename its answer came from. That's a simple
+formatting rule, not something that requires judgment, so I expect it to hold
+every time rather than just most of the time — if it fails, that's a real bug
+in the prompt or the model ignoring instructions, not bad luck.
 
 ---
 
@@ -49,29 +54,22 @@ in at least 4 of 5 tries.
      what happened into your run log. Swap them for your own if you'd rather —
      just keep five of them, or the "4 of 5" above has nothing to be 4 of. -->
 
-**Why this target:**
-<!-- What did your distances look like when you set the cutoff in Milestone 4?
-     Was there a clean gap, or did the two groups overlap? -->
+**Why this target:** TBD — I haven't set my own cutoff yet (that's Milestone
+4). I'm keeping the pre-written 4-of-5 target for now and will come back to
+this reasoning once I've actually seen the distances for real vs. out-of-scope
+questions.
 
 ---
 
 ## 4. Something about your chunks
 
-<!-- YOU WRITE THIS ONE.
+No chunk in my corpus is shorter than 100 characters or longer than 600.
 
-     How would you know if your chunks were the right size? Name something
-     countable or observable.
-
-     Examples of the right shape — don't copy these, they should come from
-     what you actually saw in Milestone 3:
-       - "At least 4 of 5 sampled chunks read as a complete thought, with no
-          sentence cut in half at either end."
-       - "No chunk is shorter than 200 characters, since anything below that
-          in my corpus turned out to be a heading with no content under it." -->
-
-
-
-**Why this target:**
+**Why this target:** When I indexed `campus_life` in Milestone 1, my 88 chunks
+came out averaging 317 characters, ranging from 178 to 549 — comfortably
+inside 100–600. These are short, single-paragraph posts, so anything under
+100 characters would be too fragmentary to hold a full fact, and anything
+over 600 would suggest two unrelated posts got merged into one chunk.
 
 
 
@@ -79,17 +77,14 @@ in at least 4 of 5 tries.
 
 ## 5. Your choice
 
-<!-- YOU WRITE THIS ONE TOO.
+For at least 4 of my 5 test questions, the source the system names actually
+contains the `expects` phrase — not just any source, the right one.
 
-     Pick something you actually care about getting right. It could be about
-     speed, about refusals, about a particular kind of question your corpus
-     handles badly, about source attribution being correct rather than merely
-     present — anything, as long as it names a number or an observable
-     outcome. -->
-
-
-
-**Why this target:**
+**Why this target:** This is different from criterion 2 — that one only checks
+that a source gets named at all, not whether it's the correct one. I care
+about this because a confidently wrong citation is worse than no citation.
+Same reasoning as criterion 1: my library question is the one most likely to
+cite the wrong document, since the corpus has two library-related files.
 
 
 
