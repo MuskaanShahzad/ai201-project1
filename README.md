@@ -159,35 +159,89 @@ Instead, 12 course-review files split, separating the class info from a
 one-line piece of advice. I corrected the README to say what actually
 happened instead of the original guess.
 
+
+
 # Unit 2
 
-<!-- These sections get ADDED to what's already above. Don't delete or rewrite
-     unit 1 — the point is that someone can see what you said before you knew
-     how it went. -->
+## Run Log
 
-## Run Log — Before
+Evidence file: [`results/run_2026-09-23_2009_before.md`](results/run_2026-09-23_2009_before.md)
+(produced by `run_eval.py --label before`, 3 real runs per question, caching off).
 
-<!-- Your five criteria, three runs each. `python run_eval.py --label before`
-     runs the questions, puts the OUT_OF_SCOPE ones through the gate, and
-     writes it all into results/ for you. Targets come from criteria.md; the
-     verdict column is your call.
-
-     Criterion 3 is measured in one deterministic pass rather than three, so
-     the same number goes in all three run columns. That's correct, not lazy.
-
-     Milestone 1. -->
+Criteria 1, 3, and 4 are measured against things that don't change between
+runs — which chunks retrieval returns, and how long those chunks are — so the
+same number legitimately appears in all three run columns. Criteria 2 and 5
+depend on what the model writes, so those are the ones that could actually
+move.
 
 | Criterion | Target | Run 1 | Run 2 | Run 3 | Verdict |
 |---|---|---|---|---|---|
-| 1. Retrieved chunk contains the answer | 4 of 5 |  |  |  |  |
-| 2. Every answer names a source | 5 of 5 |  |  |  |  |
-| 3. Gate stops out-of-corpus questions | 4 of 5 |  |  |  |  |
-| 4. | | | | | |
-| 5. | | | | | |
+| 1. Retrieved chunk contains the answer | 4 of 5 | 5/5 | 5/5 | 5/5 | MET |
+| 2. Every answer names a source | 5 of 5 | 5/5 | 5/5 | 5/5 | MET |
+| 3. Gate stops out-of-corpus questions | 4 of 5 | 5/5 | 5/5 | 5/5 | MET |
+| 4. No chunk shorter than 100 or longer than 600 characters | 100–600 | 94–398 | 94–398 | 94–398 | MISSED |
+| 5. Named source actually contains the `expects` phrase | 4 of 5 | 5/5 | 5/5 | 5/5 | MET |
 
-<!-- Underneath, paste the REAL output for each criterion from one of your
-     runs — the actual text your system produced, not a description of it.
-     Name the file and function that produced it. -->
+### Real output, per criterion
+
+**Criterion 1** — produced by `store.py::search`. For every one of the 5
+questions, one of the 5 retrieved chunks contains the exact `expects` phrase.
+Example, for "How long does it take for a hold on a checked-out library book
+to become available?" (`expects: "two to three days"`):
+
+```
+"On the library holds
+
+You can place a hold on a checked-out book and it usually arrives in two to
+three days. What isn't advertised: the interlibrary system covers eleven
+other institutions and requests through it take about a week but almost
+never fail."
+```
+— from `admin_library_holds.txt`, distance 0.1187 (well under the 0.6 gate).
+
+**Criterion 2** — produced by `generate.py::answer_from_chunks`. Every one of
+the 15 answers (5 questions × 3 runs) named a source. Example, run 2 of the
+transcript question:
+
+```
+Official transcripts cost $8 and take three business days electronically (admin_transcript_requests.txt).
+```
+
+**Criterion 3** — produced by `run_eval.py::check_out_of_scope` and
+`gate.py::check`. All 5 `OUT_OF_SCOPE` questions were refused before ever
+reaching the model:
+
+```
+refused  (best distance 0.825)  What is the capital of Mongolia?
+refused  (best distance 0.934)  How do I change the oil in a diesel engine?
+refused  (best distance 0.886)  Who won the 1994 World Cup?
+refused  (best distance 0.844)  What is the recommended dosage of ibuprofen for a headache?
+refused  (best distance 0.891)  How do I write a for loop in Rust?
+-> gate refused 5 of 5
+```
+
+**Criterion 4** — produced by `chunker.py::describe`, run against the current
+`campus_life` index:
+
+```
+100 chunks, 282 characters on average (shortest 94, longest 398), produced by chunker.py::split_documents
+```
+
+The two shortest chunks, both under the 100-character floor:
+
+```
+ 94  dining_verrill_street_grill.txt#1  ->  'Hours are 11:00am to 1:00am daily during term. Costs declining balance, or cash after 11:00pm.'
+ 98  housing_tamsin_court.txt#1  ->  'Laundry costs in-unit washer-dryer. On noise: quiet, structurally concrete floors between units.'
+```
+
+**Criterion 5** — produced by `generate.py::answer_from_chunks` (the citation)
+cross-checked against `store.py::search` (the chunk it should have cited).
+Example, the withdrawal question cites the one document that actually
+contains "week ten":
+
+```
+Withdrawal runs to week ten, whereas dropping ends at week six (*admin_withdrawal_deadline.txt*).
+```
 
 ## Verdicts
 
