@@ -256,11 +256,11 @@ Withdrawal runs to week ten, whereas dropping ends at week six (*admin_withdrawa
 
 | # | Criterion | Verdict | How I decided |
 |---|---|---|---|
-| 1 |  |  |  |
-| 2 |  |  |  |
-| 3 |  |  |  |
-| 4 |  |  |  |
-| 5 |  |  |  |
+| 1 | Retrieved chunks contain the answer | MET | Target was 4 of 5; all 3 runs hit 5 of 5, beating the target every time. |
+| 2 | Every answer names a source | MET | Target was 5 of 5; all 3 runs hit 5 of 5 with no exceptions. |
+| 3 | Gate stops out-of-corpus questions | MET | Target was 4 of 5; the gate refused 5 of 5, and since it's a fixed distance comparison it can't vary between runs. |
+| 4 | No chunk shorter than 100 or longer than 600 characters | MISSED | Two chunks (94 and 98 characters) fall under the 100-character floor; being only a few characters short still breaks a hard floor — the target didn't say "approximately." |
+| 5 | Named source contains the `expects` phrase | MET | Target was 4 of 5; all 3 runs hit 5 of 5, and the citations matched the correct document even on the library question I flagged as riskiest. |
 
 ## Diagnoses
 
