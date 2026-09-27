@@ -159,6 +159,20 @@ Instead, 12 course-review files split, separating the class info from a
 one-line piece of advice. I corrected the README to say what actually
 happened instead of the original guess.
 
+**3.** For Milestone 2's closest call (criterion 4, missed by only 6
+characters), I asked Claude to argue the opposite verdict as strongly as it
+could before I finalized MISSED. It argued the miss should stand — the
+target said "no chunk under 100," not "no chunk *way* under 100" — which held
+up and kept me from softening a real miss into a technicality.
+
+**4.** For Milestone 4, before touching any code, I asked Claude to tell me
+why my planned fix (merging undersized trailing chunks into the previous
+chunk) might not work. It checked the actual two affected documents and
+flagged that the fix could, in principle, re-glue unrelated facts together —
+the exact problem my Unit 1 chunker was built to avoid. That didn't happen
+with my current two documents, but it's a real limitation I kept in "What's
+Still Broken" instead of ignoring it because the criterion currently passes.
+
 
 
 # Unit 2
@@ -297,13 +311,7 @@ a ceiling guard with no floor guard — so it's the smallest change that
 targets the actual cause, not a bigger change (a new chunking strategy,
 hybrid search) that the diagnosis never pointed at.
 
-<!-- Connect it to a specific diagnosis above in one sentence. If you can't,
-     you picked a fix because it sounded impressive. -->
-
 ### Run Log — After
-
-<!-- Same format, same five criteria, three runs each.
-     `python run_eval.py --label after` -->
 
 | Criterion | Target | Run 1 | Run 2 | Run 3 | Verdict |
 |---|---|---|---|---|---|
@@ -331,8 +339,6 @@ run (0.119, 0.158, 0.245, 0.358, 0.218), because neither
 in any of the 5 test questions. One targeted fix, one criterion moved,
 nothing else touched.
 
-<!-- Milestone 4. -->
-
 ## What's Still Broken
 
 <!-- For each criterion still missed after your fix: what you'd do about it,
@@ -343,9 +349,41 @@ nothing else touched.
 
      Milestone 5. -->
 
+All 5 criteria are MET after the Milestone 4 fix — nothing is failing on
+measured evidence right now. That's not the same as saying nothing is left.
+
+**The floor-guard fix is structural, not semantic.** It merges any
+undersized trailing chunk into the chunk before it, with no check on whether
+the two are actually about the same thing. That was safe for both cases I
+found — Verrill Street Grill's hours/cost and Tamsin Court's laundry/noise
+are each closely related to the rest of their own post — but if a future
+document had a short, unrelated trailing fact, this fix would glue it onto
+unrelated content, recreating the exact "two facts crammed into one chunk"
+problem the sentence-aware splitter in Unit 1 was built to prevent. I stopped
+here because building a "only merge if it's actually the same topic" check is
+a judgment call, not a one-line fix, and this unit only allows one system
+change.
+
+**Small sample size.** Every verdict rests on 5 in-corpus questions, 5
+out-of-scope questions, and 3 runs. The margins are wide right now (e.g.
+0.358 vs. 0.825 for the relevance gate), so I'm not worried today, but 5
+questions isn't enough to be confident this holds on a much larger or more
+varied question set. I stopped at 5 and 3 because that's what this unit
+asked for, not because I've proven it generalizes.
+
 ## What I'd Do Differently
 
 <!-- Knowing what you know now — which of your five criteria would you write
      differently, and why?
 
      Milestone 5. -->
+
+**Criterion 2 ("every answer names a source")** never had a real chance to
+miss — it only checks that the model obeys a direct formatting instruction,
+which it always does. But looking back across both run logs, the *format* of
+that citation isn't consistent: some answers write `Source:
+admin_grade_appeals.txt`, others write `(admin_grade_appeals.txt)` inline,
+one wraps it in backticks. All of those technically "name a source," so
+criterion 2 can't see the inconsistency. Next time I'd write it as *"every
+answer cites its source in the same format"* — a real thing to check,
+instead of a target I already knew I'd hit.
