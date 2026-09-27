@@ -49,11 +49,6 @@ When I ask a question my documents clearly don't cover, the relevance gate
 stops it and the system returns "I don't have enough information about that" —
 in at least 4 of 5 tries.
 
-<!-- The five questions are the ones in `OUT_OF_SCOPE` at the bottom of
-     `questions.py`, and `run_eval.py` puts them through the gate and writes
-     what happened into your run log. Swap them for your own if you'd rather —
-     just keep five of them, or the "4 of 5" above has nothing to be 4 of. -->
-
 **Why this target:** In Milestone 4 I measured the best distance for all 5 of
 my test questions (worst case 0.358) against all 5 `OUT_OF_SCOPE` questions
 (best case 0.825) — a gap of nearly 0.47 with nothing in it. Both groups landed
@@ -74,8 +69,6 @@ came out averaging 317 characters, ranging from 178 to 549 — comfortably
 inside 100–600. These are short, single-paragraph posts, so anything under
 100 characters would be too fragmentary to hold a full fact, and anything
 over 600 would suggest two unrelated posts got merged into one chunk.
-
-
 
 ---
 

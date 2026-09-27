@@ -245,15 +245,6 @@ Withdrawal runs to week ten, whereas dropping ends at week six (*admin_withdrawa
 
 ## Verdicts
 
-<!-- MET or MISSED for each of the five, against the target you wrote last
-     unit — not a new one. Plus a sentence on how you decided. That sentence
-     matters most where it was close.
-
-     If your target said 4 of 5 and your runs came out 4, 3, 4, that's a MISS.
-     The target has to hold, not show up occasionally.
-
-     Milestone 2. -->
-
 | # | Criterion | Verdict | How I decided |
 |---|---|---|---|
 | 1 | Retrieved chunks contain the answer | MET | Target was 4 of 5; all 3 runs hit 5 of 5, beating the target every time. |
@@ -281,6 +272,35 @@ Withdrawal runs to week ten, whereas dropping ends at week six (*admin_withdrawa
      low, and which one you'd tighten and to what.
 
      Milestone 3. -->
+
+**Criterion 4 — stage: chunking.**
+
+Both under-floor chunks are the trailing chunk of a document that just barely
+needed to split at all:
+
+- `dining_verrill_street_grill.txt` is 415 characters, 15 over the
+  400-character group limit. The leftover after the first group is one
+  sentence — `"Hours are 11:00am to 1:00am daily during term. Costs declining
+  balance, or cash after 11:00pm."` — which becomes chunk `#1` on its own, 94
+  characters.
+- `housing_tamsin_court.txt` is 433 characters, same shape. The leftover
+  sentence — `"Laundry costs in-unit washer-dryer. On noise: quiet,
+  structurally concrete floors between units."` — becomes chunk `#1` on its
+  own, 98 characters.
+
+**Mechanism:** `split_documents` (`chunker.py`) walks sentence by sentence and
+closes a group as soon as the next sentence would push it past 400
+characters, then starts a new group for whatever's left. It checks whether a
+chunk is too *long* before closing it, but never checks whether the leftover
+group it just started is too *short* to stand alone. There's a ceiling guard
+and no floor guard.
+
+**Pattern:** one bug, not two. Both misses are the same shape — a document
+that lands just over the 400-character split point, whose trailing sentence
+is short enough to fall under the 100-character floor by itself. Any other
+document with that shape would fail the same way.
+
+No other criterion missed, so there's nothing else to diagnose here.
 
 ## The Improvement
 
