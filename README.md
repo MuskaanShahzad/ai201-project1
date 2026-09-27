@@ -140,7 +140,7 @@ chunk and cited it — so I didn't tighten the instruction further.
 | What is the recommended dosage of ibuprofen for a headache? | No | 0.844 |
 | How do I write a for loop in Rust? | No | 0.891 |
 
-## How I Used AI
+## How I Used AI - Unit 1 
 
 **1.** For criteria 4 and 5, I asked Claude to help me turn my ideas into
 properly worded acceptance criteria. It asked me what would make a chunk feel
@@ -158,6 +158,8 @@ ran it, that file didn't split — it fit in one 343-character chunk anyway.
 Instead, 12 course-review files split, separating the class info from a
 one-line piece of advice. I corrected the README to say what actually
 happened instead of the original guess.
+
+## How I Used AI - Unit 2
 
 **3.** For Milestone 2's closest call (criterion 4, missed by only 6
 characters), I asked Claude to argue the opposite verdict as strongly as it
@@ -177,7 +179,7 @@ Still Broken" instead of ignoring it because the criterion currently passes.
 
 # Unit 2
 
-## Run Log
+## Run Log — Before
 
 Evidence file: [`results/run_2026-09-23_2009_before.md`](results/run_2026-09-23_2009_before.md)
 (produced by `run_eval.py --label before`, 3 real runs per question, caching off).
@@ -341,14 +343,6 @@ nothing else touched.
 
 ## What's Still Broken
 
-<!-- For each criterion still missed after your fix: what you'd do about it,
-     and why you stopped where you did.
-
-     "I ran out of time" is fine if it's true. Pretending nothing is left is
-     not.
-
-     Milestone 5. -->
-
 All 5 criteria are MET after the Milestone 4 fix — nothing is failing on
 measured evidence right now. That's not the same as saying nothing is left.
 
@@ -372,11 +366,6 @@ varied question set. I stopped at 5 and 3 because that's what this unit
 asked for, not because I've proven it generalizes.
 
 ## What I'd Do Differently
-
-<!-- Knowing what you know now — which of your five criteria would you write
-     differently, and why?
-
-     Milestone 5. -->
 
 **Criterion 2 ("every answer names a source")** never had a real chance to
 miss — it only checks that the model obeys a direct formatting instruction,
