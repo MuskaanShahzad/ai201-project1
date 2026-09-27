@@ -112,6 +112,7 @@ def split_documents(
     """
     chunk_size = chunk_size or config.CHUNK_SIZE
     overlap = overlap or config.CHUNK_OVERLAP
+    min_chunk_size = config.MIN_CHUNK_SIZE
 
     chunks: list[Chunk] = []
     for doc in documents:
@@ -120,12 +121,15 @@ def split_documents(
             continue
 
         groups: list[list[str]] = []
+        carry_counts: list[int] = []
         current: list[str] = []
         current_len = 0
+        carry_count = 0
 
         for sentence in sentences:
             if current and current_len + len(sentence) + 1 > chunk_size:
                 groups.append(current)
+                carry_counts.append(carry_count)
                 # Carry trailing sentences forward so the next chunk doesn't
                 # start cold — but only whole sentences, up to `overlap` chars.
                 carried: list[str] = []
@@ -136,12 +140,24 @@ def split_documents(
                     carried.insert(0, s)
                     carried_len += len(s) + 1
                 current, current_len = carried, carried_len
+                carry_count = len(carried)
 
             current.append(sentence)
             current_len += len(sentence) + 1
 
         if current:
             groups.append(current)
+            carry_counts.append(carry_count)
+
+        # Milestone 4 fix for criterion 4: a trailing chunk under the
+        # character floor gets folded back into the chunk before it instead
+        # of standing alone. Only the carried-over (already duplicated)
+        # sentences are dropped, so nothing doubles up.
+        if len(groups) > 1 and len(" ".join(groups[-1])) < min_chunk_size:
+            new_sentences = groups[-1][carry_counts[-1]:]
+            groups[-2].extend(new_sentences)
+            groups.pop()
+            carry_counts.pop()
 
         for i, group in enumerate(groups):
             chunks.append(

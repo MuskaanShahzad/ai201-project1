@@ -255,24 +255,6 @@ Withdrawal runs to week ten, whereas dropping ends at week six (*admin_withdrawa
 
 ## Diagnoses
 
-<!-- For each miss: which stage caused it, and how. The stage alone isn't
-     enough — you need the mechanism.
-
-     Not a diagnosis: "Question 3 didn't work."
-     A diagnosis:     "Question 3 asks about laundry costs. The answer is in
-                       one sentence that got split across two chunks, so
-                       neither chunk on its own contains it."
-
-     The five stages: loading → chunking → embedding → retrieval → generation.
-
-     Look for a pattern. If three misses all ask about numbers, that's one
-     problem, not three.
-
-     Missed nothing? Say so, then say honestly whether your targets were set
-     low, and which one you'd tighten and to what.
-
-     Milestone 3. -->
-
 **Criterion 4 — stage: chunking.**
 
 Both under-floor chunks are the trailing chunk of a document that just barely
@@ -295,7 +277,7 @@ chunk is too *long* before closing it, but never checks whether the leftover
 group it just started is too *short* to stand alone. There's a ceiling guard
 and no floor guard.
 
-**Pattern:** one bug, not two. Both misses are the same shape — a document
+**Pattern:** one bug, not two. Both misses are the same shape; a document
 that lands just over the 400-character split point, whose trailing sentence
 is short enough to fall under the 100-character floor by itself. Any other
 document with that shape would fail the same way.
@@ -304,9 +286,16 @@ No other criterion missed, so there's nothing else to diagnose here.
 
 ## The Improvement
 
-**What I changed:**
+**What I changed:** Added a floor check to `chunker.py::split_documents`. It
+already checked whether a chunk was getting too *long* before closing it; now
+it also checks the last chunk of each document after splitting, and if that
+trailing chunk is under `config.MIN_CHUNK_SIZE` (100 characters), it gets
+folded back into the chunk before it instead of standing alone.
 
-**Why I picked it:**
+**Why I picked it:** This is the exact mechanism the diagnosis above named —
+a ceiling guard with no floor guard — so it's the smallest change that
+targets the actual cause, not a bigger change (a new chunking strategy,
+hybrid search) that the diagnosis never pointed at.
 
 <!-- Connect it to a specific diagnosis above in one sentence. If you can't,
      you picked a fix because it sounded impressive. -->
@@ -318,20 +307,31 @@ No other criterion missed, so there's nothing else to diagnose here.
 
 | Criterion | Target | Run 1 | Run 2 | Run 3 | Verdict |
 |---|---|---|---|---|---|
-| 1. Retrieved chunk contains the answer | 4 of 5 |  |  |  |  |
-| 2. Every answer names a source | 5 of 5 |  |  |  |  |
-| 3. Gate stops out-of-corpus questions | 4 of 5 |  |  |  |  |
-| 4. | | | | | |
-| 5. | | | | | |
+| 1. Retrieved chunk contains the answer | 4 of 5 | 5/5 | 5/5 | 5/5 | MET |
+| 2. Every answer names a source | 5 of 5 | 5/5 | 5/5 | 5/5 | MET |
+| 3. Gate stops out-of-corpus questions | 4 of 5 | 5/5 | 5/5 | 5/5 | MET |
+| 4. No chunk shorter than 100 or longer than 600 characters | 100–600 | 111–416 | 111–416 | 111–416 | MET |
+| 5. Named source actually contains the `expects` phrase | 4 of 5 | 5/5 | 5/5 | 5/5 | MET |
+
+Evidence file: [`results/run_2026-09-27_1700_after.md`](results/run_2026-09-27_1700_after.md)
+(produced by `run_eval.py --label after --variant after`, same 5 questions, 3
+real runs each, caching off, against a re-index built with the fixed
+chunker.)
 
 **Did it help?**
 
-<!-- Say plainly whether it did, and how you know. If it made things worse,
-     say that — a change that backfired, honestly reported, earns full credit
-     and is more interesting than one that worked. What matters is that you can
-     tell.
+Yes, and only where it was supposed to. Criterion 4 flips from MISSED to
+MET: re-chunking with the floor guard dropped the corpus from 100 chunks
+down to 98 (the two undersized documents no longer split at all) and the
+range moved from 94–398 to 111–416 — both ends now inside the 100–600
+target. Criteria 1, 2, 3, and 5 are unchanged: all 5 test questions
+retrieved the identical chunks at the identical distances as the "before"
+run (0.119, 0.158, 0.245, 0.358, 0.218), because neither
+`dining_verrill_street_grill.txt` nor `housing_tamsin_court.txt` is involved
+in any of the 5 test questions. One targeted fix, one criterion moved,
+nothing else touched.
 
-     Milestone 4. -->
+<!-- Milestone 4. -->
 
 ## What's Still Broken
 

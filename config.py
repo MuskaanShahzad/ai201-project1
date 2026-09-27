@@ -41,6 +41,12 @@ CORPUS = os.getenv("AI201_CORPUS", "campus_life")
 CHUNK_SIZE = 400        # characters per chunk
 CHUNK_OVERLAP = 60      # characters shared between neighbouring chunks
 
+# Milestone 4 (unit 2): criterion 4's own floor. Added after diagnosing that
+# split_documents guarded against chunks being too long but never checked for
+# too short — a trailing leftover sentence could end up as its own undersized
+# chunk. A trailing chunk under this gets folded back into the one before it.
+MIN_CHUNK_SIZE = 100
+
 
 # ─── Retrieval (Milestone 4) ─────────────────────────────────────────────────
 
